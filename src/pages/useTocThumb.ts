@@ -1,10 +1,5 @@
-import type { TTocItem } from './TOC.vue'
-import { useAnchorObserver } from './useAnchorObserver'
-
 export type TOCThumb = [top: number, height: number]
-export function useTocThumb(containerRef: Ref<HTMLElement | null>, tocList: TTocItem[]): Ref<TOCThumb> {
-  const headings = tocList.map(item => item.link.split('#')[1])
-  const active = useAnchorObserver(headings, false)
+export function useTocThumb(containerRef: Ref<HTMLElement | null>, active: Ref<string[]>): Ref<TOCThumb> {
   const pos = ref<TOCThumb>([0, 0])
 
   watch(active, () => {

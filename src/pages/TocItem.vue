@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { TTocItem } from './TOC.vue'
 
-const { item, upper, lower } = defineProps<{
+const { item, upper, lower, isActive } = defineProps<{
   item: TTocItem
   upper: number
   lower: number
+  isActive: boolean
 }>()
 
 function getItemOffset(depth: number): number {
@@ -27,7 +28,7 @@ const lowerOffset = computed(() => {
 </script>
 
 <template>
-  <a :href="item.link" class="py-2 transition-colors [overflow-wrap:anywhere] relative first:pt-0 last:pb-0" :style="{ paddingInlineStart: `${offset}px` }">
+  <a :href="item.link" class="py-2 transition-colors [overflow-wrap:anywhere] relative first:pt-0 last:pb-0" :style="{ paddingInlineStart: `${offset}px` }" :class="{ 'color-#1f66f4': isActive }">
     <svg
       v-if="item.depth !== upper"
       xmlns="http://www.w3.org/2000/svg"

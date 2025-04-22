@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import TocItem from './TocItem.vue'
+import { useAnchorObserver } from './useAnchorObserver'
 import { useTocThumb } from './useTocThumb'
 
 export interface TTocItem {
@@ -15,7 +16,9 @@ const { tocList } = defineProps<{
 
 const containerRef = useTemplateRef('containerRef')
 
-const pos = useTocThumb(containerRef, tocList)
+const headings = tocList.map(item => item.link.split('#')[1])
+const active = useAnchorObserver(headings, false)
+const pos = useTocThumb(containerRef, active)
 
 const svg = ref<{
   path: string
@@ -93,7 +96,9 @@ const svgMask = computed(
       }"
     >
       <div
-        role="none" class="bg-#1f66f4 transition-all" :style="{
+        role="none"
+        class="bg-#1f66f4 transition-all"
+        :style="{
           height: `${pos[1]}px`,
           marginTop: `${pos[0]}px`,
         }"
@@ -101,7 +106,7 @@ const svgMask = computed(
     </div>
 
     <div class="m-4 flex flex-col">
-      <TocItem v-for="(item, index) in tocList" :key="item.title" :item="item" :upper="tocList[index - 1]?.depth || item.depth" :lower="tocList[index + 1]?.depth || item.depth" />
+      <TocItem v-for="(item, index) in tocList" :key="item.title" :is-active="active.includes(item.link.split('#')[1])" :item="item" :upper="tocList[index - 1]?.depth || item.depth" :lower="tocList[index + 1]?.depth || item.depth" />
     </div>
   </div>
 </template>
