@@ -1,14 +1,8 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
-import TocItem from './TocItem.vue'
+import type { TTocItem } from './TOC.vue'
+import Toc from './TOC.vue'
 
-export interface TTocItem {
-  title: string
-  link: string
-  depth: number
-}
-
-const tocList = ref<TTocItem[]>([
+const tocList: TTocItem[] = [
   {
     title: '标题1',
     link: '#1',
@@ -39,90 +33,31 @@ const tocList = ref<TTocItem[]>([
     link: '#2-2-1',
     depth: 3,
   },
-])
-
-const containerRef = useTemplateRef('containerRef')
-
-const svg = ref<{
-  path: string
-  width: number
-  height: number
-}>({
-  path: '',
-  width: 0,
-  height: 0,
-})
-
-let observer: ResizeObserver | null = null
-
-onMounted(() => {
-  if (!containerRef.value)
-    return
-
-  const container = containerRef.value
-  function onResize() {
-    if (container.clientHeight === 0)
-      return
-    let w = 0
-    let h = 0
-    const d: string[] = []
-    for (let i = 0; i < tocList.value.length; i++) {
-      const element: HTMLElement | null = container.querySelector(`a[href="#${tocList.value[i].link.slice(1)}"]`)
-      if (!element)
-        continue
-
-      const styles = getComputedStyle(element)
-      const offset = (tocList.value[i].depth - 1) * 16 + 1
-      const top = element.offsetTop + Number.parseFloat(styles.paddingTop)
-      const bottom = element.offsetTop + element.clientHeight - Number.parseFloat(styles.paddingBottom)
-
-      w = Math.max(offset, w)
-      h = Math.max(h, bottom)
-
-      d.push(`${i === 0 ? 'M' : 'L'}${offset} ${top}`)
-      d.push(`L${offset} ${bottom}`)
-      svg.value = {
-        path: d.join(' '),
-        width: w,
-        height: h,
-      }
-    }
-  }
-  observer = new ResizeObserver(onResize)
-  onResize()
-  observer.observe(container)
-})
-
-onUnmounted(() => {
-  if (observer)
-    observer.disconnect()
-})
-
-const svgMask = computed(
-  () =>
-    `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svg.value.width} ${svg.value.height}"><path d="${svg.value.path}" stroke="black" stroke-width="1" fill="none" /></svg>`)}`,
-)
+]
 </script>
 
 <template>
-  <div ref="containerRef" class="min-h-0 relative">
-    <div
-      v-if="svg.height > 0"
-      class="start-4 top-0 absolute z-1"
-      :style="{
-        width: `${svg.width}px`,
-        height: `${svg.height}px`,
-        maskImage: `url(${svgMask})`,
-        WebkitMaskImage: svgMask,
-        maskRepeat: 'no-repeat',
-        WebkitMaskRepeat: 'no-repeat',
-      }"
-    >
-      <div role="none" class="bg-#1f66f4 h-[100px] transition-all" />
-    </div>
-
-    <div class="m-4 flex flex-col">
-      <TocItem v-for="(item, index) in tocList" :key="item.title" :item="item" :upper="tocList[index - 1]?.depth || item.depth" :lower="tocList[index + 1]?.depth || item.depth" />
+  <div class="flex">
+    <Toc :toc-list="tocList" class="h-screen w-60 top-0 sticky overflow-y-auto" />
+    <div class="p-4 flex-1">
+      <div v-for="item in tocList" :key="item.link">
+        <h1 :id="item.link.slice(1)" class="text-2xl font-bold mb-2 mt-4" :style="{ 'scroll-margin-top': '80px' }">
+          {{ item.title }}
+        </h1>
+        <p class="text-gray-700 h-100">
+          这里是关于 "{{ item.title }}" 的内容... <br>
+          添加一些足够长的占位内容来测试滚动。 <br>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+          nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+      </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+html {
+  scroll-behavior: smooth;
+}
+</style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TTocItem } from './index.vue'
+import type { TTocItem } from './TOC.vue'
 
 const { item, upper, lower } = defineProps<{
   item: TTocItem
@@ -27,7 +27,7 @@ const lowerOffset = computed(() => {
 </script>
 
 <template>
-  <a :href="item.link" class="bottom:bt-0 py-2 transition-colors [overflow-wrap:anywhere] relative first:pt-0" :style="{ paddingInlineStart: `${offset}px` }">
+  <a :href="item.link" class="py-2 transition-colors [overflow-wrap:anywhere] relative first:pt-0 last:pb-0" :style="{ paddingInlineStart: `${offset}px` }">
     <svg
       v-if="item.depth !== upper"
       xmlns="http://www.w3.org/2000/svg"
