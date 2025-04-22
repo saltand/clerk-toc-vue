@@ -29,6 +29,7 @@ const lowerOffset = computed(() => {
 
 <template>
   <a :href="item.link" class="py-2 transition-colors [overflow-wrap:anywhere] relative first:pt-0 last:pb-0" :style="{ paddingInlineStart: `${offset}px` }" :class="{ 'color-#1f66f4': isActive }">
+    <div class="cursor-pointer inset-0 absolute z-10" />
     <svg
       v-if="item.depth !== upper"
       xmlns="http://www.w3.org/2000/svg"
